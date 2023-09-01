@@ -1,0 +1,102 @@
+{% extends 'admin/change_list.html' %}
+{% block result_list %}
+<h3> Category</h3>
+{{block.super}}
+{% endblock result_list %}
+{% block extrahead %}
+<script src="https://kit.fontawesome.com/83eb961578.js" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock extrahead %}
+{% block content %}
+{{block.super}}
+  <script>
+       $(document).ready(function() {
+        
+        let parent = $('.field-status')
+        parent.click(function(){
+        console.log("Parent Clicked")
+        let child = $(this).children()        
+        let extra = child.attr("id");
+        
+
+        // To select current input field id number
+        const stringWithDigit = extra;
+        const digitMatch = stringWithDigit.match(/\d+/);
+        let firstDigit = 0
+        if (digitMatch) {
+           firstDigit = parseInt(digitMatch[0]);
+          console.log(firstDigit);
+        }
+        // To check and set status value 
+        let statusValue;
+        if (child.prop("checked")){
+            child.prop("checked",false)
+            statusValue = false
+            console.log(statusValue)
+        }
+        else{
+            child.prop("checked",true)
+            statusValue = true
+            console.log(statusValue)
+        }
+
+        let csr = $("input[name=csrfmiddlewaretoken]").val();
+        let cid = firstDigit;
+        let body={status:statusValue,cid:cid,csrfmiddlewaretoken:csr};
+
+        $.ajax({
+            
+                method:"POST",
+                url:"{% url 'display-category-list' %}",
+                data:body,
+                success:function(data){
+                    console.log(data)
+                }
+           
+        });        
+
+      });
+
+      let deleteBtn = $('.deleteBtn')
+      console.log(deleteBtn) 
+      deleteBtn.click(function(e){
+        e.preventDefault()
+        console.log("ABC")
+        let rowid = $('.field-delete:eq(1)').prev().prev().children().prop("id")
+        //let row = $(`.${rowid}`).parent().parent()
+            
+        const stringWithDigit =`${rowid}`;
+        const digitMatch = stringWithDigit.match(/\d+/);
+        let firstDigit = 0
+        if (digitMatch) {
+           firstDigit = parseInt(digitMatch[0]);
+          console.log(firstDigit);
+        }
+        
+        // let el = $(`#id_form-${firstDigit}-status`).parent().parent()[0].hide()
+        let csr = $("input[name=csrfmiddlewaretoken]").val();
+        let cid = firstDigit;
+        let body={cid:cid,csrfmiddlewaretoken:csr};
+
+        $.ajax({
+            method:"POST",
+            url :"{% url 'delete-category-list' %}",
+            data :body,
+            success:function(data){
+                console.log(data)
+                let abx = $(`#id_form-${firstDigit}-status`).
+            //    abx.remove()
+                console.log(abx)
+            }
+
+        })
+       
+        
+      }) 
+  
+    });
+  </script>
+{% endblock content %}
+
+
+

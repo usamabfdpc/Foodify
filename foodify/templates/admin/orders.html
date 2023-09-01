@@ -1,0 +1,180 @@
+{% extends 'admin/change_form.html' %} {% block after_related_objects %}
+<h2>Discount Data</h2>
+<div>
+  <p>Discount : <span class="discount"> </span></p>
+  <p>Type : <span class="type"> </span></p>
+  <p>Valid : <span class="valid"> </span></p>
+</div>
+{% endblock %} {% block admin_change_form_document_ready %}
+<script>
+  window.addEventListener("load", function () {
+    (function ($) {
+      // Set Initial State
+      function initial() {
+        let extraEl = $(".extra option");
+        // extraEl.hide();
+      }
+
+      // Calling Initials
+      initial();
+
+      // When click on Recipee Related Data will load
+      let recipeeEl = $(".orderRecipee");
+      recipeeEl.click(function () {
+
+        // Getting Recipee Id to manipulate related data
+
+        let recipee = $(this).attr("id");        
+        const stringWithDigit = recipee;
+        const digitMatch = stringWithDigit.match(/\d+/);
+
+        let firstDigit = 0
+        if (digitMatch) {
+           firstDigit = parseInt(digitMatch[0]);
+          
+        }
+        varientEl = $(`#id_orderrecipee_set-${firstDigit}-varients option`)
+        varientEl.hide()
+        varientEl.append('<h3>ABC,/h3>')
+        
+
+        //let vid = $(`#id_orderrecipee_set-${firstDigit}-varients`).val();
+        let quantaty = $(`#id_orderrecipee_set-${firstDigit}-quantaty`).val();
+        let rid = $(`#id_orderrecipee_set-${firstDigit}-recipee`).val();
+        let exid = $(`#id_orderrecipee_set-${firstDigit}-extra`).val();
+        let csr = $("input[name=csrfmiddlewaretoken]").val();
+        let body = {exid:exid,rid:rid,quantaty:quantaty,csrfmiddlewaretoken:csr}
+
+
+        
+      
+        // Ajax Call for recipee Selection
+        $.ajax({
+          url: "{% url 'get-recipee' %}",
+          method: "POST",
+          data: body,
+          success: function (data) {
+            let extraOptionEl = $(".extra option");
+            extraOptionEl.show();            
+            // $(".recipeePrice").val(data.price);
+            $(`#id_orderrecipee_set-${firstDigit}-price`).val(data.price);
+
+          },
+        });
+      });
+
+//  Working With Quantaty AJAX call
+
+      let typingTimer; //timer identifier
+      let doneTypingInterval = 1000; //time in ms, 5 seconds for example
+      let $input = $(".quantaty");
+
+      //on keyup, start the countdown
+      $input.on("keyup", function () {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(doneTyping, doneTypingInterval);
+      });
+
+      //on keydown, clear the countdown
+      $input.on("keydown", function () {
+        clearTimeout(typingTimer);
+      });
+
+      //user is "finished typing," do something
+      function doneTyping() {
+        
+        let quantaty = Number($(".quantaty").val());
+        if (quantaty) {
+
+          $('.quantaty').click(function(){
+
+          
+          let quant = $(this).attr("id");        
+          const stringWithDigit = quant;
+          const digitMatch = stringWithDigit.match(/\d+/);
+  
+          let firstDigit = 0
+          if (digitMatch) {
+             firstDigit = parseInt(digitMatch[0]);
+            
+          }
+          console.log(firstDigit)
+          
+            // let recipee_id = $(".orderRecipee").val();
+            // let extras_id = $(".extra").val();
+            // let csr = $("input[name=csrfmiddlewaretoken]").val();
+            // let body = {
+            //   quantaty: quantaty,
+            //   csrfmiddlewaretoken: csr,
+            //   exid: extras_id,
+            //   rid: recipee_id,
+            // };
+
+        let quantaty = $(`#id_orderrecipee_set-${firstDigit}-quantaty`).val();
+        let rid = $(`#id_orderrecipee_set-${firstDigit}-recipee`).val()
+        let exid = $(`#id_orderrecipee_set-${firstDigit}-extra`).val();
+        let csr = $("input[name=csrfmiddlewaretoken]").val();
+        let body = {exid:exid,rid:rid,quantaty:quantaty,csrfmiddlewaretoken:csr}
+
+        
+            
+           
+            // Ajax call for quantaty
+            $.ajax({
+              url: "{% url 'get-recipee' %}",
+              method: "POST", 
+              data: body,
+              success: function (data) {
+                $(`#id_orderrecipee_set-${firstDigit}-price`).val(data.price);
+              },
+              
+            });
+            
+            // Clicked Closed
+          });
+        }
+      };
+
+
+      
+      // Working With AJAX Call for Extra
+      let extraEl = $('.extra')
+      extraEl.click(function(){
+        let extra = $(this).attr("id");
+        const stringWithDigit = extra;
+        const digitMatch = stringWithDigit.match(/\d+/);
+
+        let firstDigit = 0
+        if (digitMatch) {
+           firstDigit = parseInt(digitMatch[0]);
+          // console.log(firstDigit); // Output: 1
+        }
+
+        
+        let quantaty = $(`#id_orderrecipee_set-${firstDigit}-quantaty`).val();
+        let rid = $(`#id_orderrecipee_set-${firstDigit}-recipee`).val()
+        let exid = $(`#id_orderrecipee_set-${firstDigit}-extra`).val();
+        let csr = $("input[name=csrfmiddlewaretoken]").val();
+        let body = {exid:exid,rid:rid,quantaty:quantaty,csrfmiddlewaretoken:csr}
+
+        
+
+        $.ajax({
+            url: "{% url 'get-recipee' %}",
+            method: "POST", 
+            data: body,
+            success: function (data) {
+              console.log("F",firstDigit)
+               $(`#id_orderrecipee_set-${firstDigit}-price`).val(data.price);
+            },
+            
+          });
+
+      })
+
+
+    })(django.jQuery);
+  });
+</script>
+
+{% endblock %}
